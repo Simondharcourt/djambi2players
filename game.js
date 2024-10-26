@@ -75,6 +75,7 @@ ws.onerror = function(error) {
 // Modifier ces variables globales
 let clientAssignedColors = []; // Tableau pour stocker les 3 couleurs assignées
 let clientAssignedIndices = []; // Tableau pour stocker les indices des couleurs assignées
+let clientAssignedIndex = null;
 
 ws.onmessage = function(event) {
     console.log("Message reçu du serveur:", event.data);
@@ -83,6 +84,7 @@ ws.onmessage = function(event) {
         // Stocker les couleurs et indices assignés
         clientAssignedColors = data.colors;
         clientAssignedIndices = data.indices;
+        clientAssignedIndex = data.indices[1];
         console.log("Couleurs assignées:", clientAssignedColors);
         console.log("Indices assignés:", clientAssignedIndices);
         draw();
@@ -299,7 +301,9 @@ function selectPiece(q, r) {
         const piece = gameState.pieces.find(p => p.q === q && p.r === r && !p.is_dead);
         if (piece) {
             const currentPlayerColor = getCurrentPlayerColor();
-            if (clientAssignedColors.includes(NAMES[piece.color]) && 
+            let pieceColor = `rgb(${piece.color[0]}, ${piece.color[1]}, ${piece.color[2]})`;
+            let pieceName = NAMES[pieceColor];
+            if (clientAssignedColors.includes(pieceName) && 
                 clientAssignedIndices.includes(gameState.current_player_index)) {
                 selectedPiece = piece;
                 possibleMoves = calculatePossibleMoves(piece);
