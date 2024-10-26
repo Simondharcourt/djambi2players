@@ -60,7 +60,7 @@ let possibleMoves = [];
 let availableCells = []; // Ajoutez cette variable globale
 
 // Ajouter le WebSocket
-const ws = new WebSocket('wss://djambi6players-105ba3b611ff.herokuapp.com');  // Remplacez par l'URL de votre serveur
+const ws = new WebSocket('wss://djambi2players-cff717eb2c48.herokuapp.com/');  // URL du serveur mise à jour
 
 ws.onopen = function() {
     console.log('Connecté au serveur WebSocket');
@@ -637,6 +637,7 @@ function drawPlayerTurnArrow() {
         ctx.stroke();
     }
 }
+
 
 
 
