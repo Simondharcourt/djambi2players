@@ -12,14 +12,20 @@ class DjambiServer:
         self.current_player_index = 0
         self.lock = asyncio.Lock()
         self.available_colors = list(COLORS.keys())
+        self.players = []  # Nouvelle liste pour stocker les joueurs
 
     async def register(self, websocket):
-        if self.available_colors:
-            color = self.available_colors.pop(0)
-            self.clients[websocket] = color
-            index_color = list(COLORS.keys()).index(color)
+        if len(self.available_colors) >= 3:
+            player_colors = [self.available_colors.pop(0) for _ in range(3)]
+            self.clients[websocket] = player_colors
+            self.players.append(websocket)
+            color_indices = [list(COLORS.keys()).index(color) for color in player_colors]
             await self.send_board_state(websocket)
-            await websocket.send(json.dumps({"type": "color_assignment", "color": color, "index": index_color}))
+            await websocket.send(json.dumps({
+                "type": "color_assignment",
+                "colors": player_colors,
+                "indices": color_indices
+            }))
             state = self.board.to_json()
             state['type'] = 'state'
             state['available_colors'] = self.available_colors
@@ -30,9 +36,10 @@ class DjambiServer:
 
     async def unregister(self, websocket):
         if websocket in self.clients:
-            color = self.clients.pop(websocket)
-            self.available_colors = [color] + self.available_colors
-            if len(self.available_colors) == 6:
+            player_colors = self.clients.pop(websocket)
+            self.available_colors.extend(player_colors)
+            self.players.remove(websocket)
+            if len(self.players) == 0:
                 self.board = Board(0)  # Réinitialiser le plateau de jeu
                 self.board.rl = True
                 self.current_player_index = 0

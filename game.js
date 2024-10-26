@@ -72,19 +72,19 @@ ws.onerror = function(error) {
     initializeDefaultState();
 };
 
-// Variable globale pour stocker la couleur assignée
-let clientAssignedColor = "white"; // Couleur par défaut
-let clientAssignedIndex = 0;
+// Modifier ces variables globales
+let clientAssignedColors = []; // Tableau pour stocker les 3 couleurs assignées
+let clientAssignedIndices = []; // Tableau pour stocker les indices des couleurs assignées
 
 ws.onmessage = function(event) {
     console.log("Message reçu du serveur:", event.data);
     const data = JSON.parse(event.data);
     if (data.type === 'color_assignment') {
-        // Assigner la couleur reçue à une variable ou un état
-        clientAssignedColor = data.color; // Stocker la couleur assignée
-        clientAssignedIndex = data.index;
-        console.log("Couleur assignée:", clientAssignedColor);
-        console.log("Index assigné:", clientAssignedIndex);
+        // Stocker les couleurs et indices assignés
+        clientAssignedColors = data.colors;
+        clientAssignedIndices = data.indices;
+        console.log("Couleurs assignées:", clientAssignedColors);
+        console.log("Indices assignés:", clientAssignedIndices);
         draw();
     } else if (data.type === 'state') {
         gameState = data;
@@ -299,7 +299,8 @@ function selectPiece(q, r) {
         const piece = gameState.pieces.find(p => p.q === q && p.r === r && !p.is_dead);
         if (piece) {
             const currentPlayerColor = getCurrentPlayerColor();
-            if (areColorsEqual(Object.keys(COLORS)[gameState.current_player_index], currentPlayerColor) && areColorsEqual(piece.color, COLORS[currentPlayerColor])) {
+            if (clientAssignedColors.includes(NAMES[piece.color]) && 
+                clientAssignedIndices.includes(gameState.current_player_index)) {
                 selectedPiece = piece;
                 possibleMoves = calculatePossibleMoves(piece);
                 draw();
@@ -437,7 +438,10 @@ function drawSelectedPieceHalo() {
 
 // Fonction pour obtenir la couleur du joueur actuel
 function getCurrentPlayerColor() {
-    return clientAssignedColor; // Retourner la couleur assignée
+    if (clientAssignedIndices.includes(gameState.current_player_index)) {
+        return clientAssignedColors[clientAssignedIndices.indexOf(gameState.current_player_index)];
+    }
+    return null; // Retourner null si ce n'est pas le tour du joueur
 }
 
 // Fonction pour envoyer un mouvement au serveur
@@ -486,25 +490,26 @@ function drawPlayerTurn() {
         ctx.lineWidth = 2;
         const text = `Tour du joueur:`;
         ctx.fillText(text, 20, 30);
-        // Dessiner un cercle de la couleur du joueur
+        // Dessiner un cercle de la couleur du joueur actuel
         ctx.beginPath();
         ctx.arc(202, 22, 15, 0, 2 * Math.PI);
         ctx.fillStyle = playerColor;
         ctx.fill();
         ctx.stroke();
-        // Ajouter l'affichage de la couleur du client
-        const clientColor = getCurrentPlayerColor();
-        const clientColorText = `Votre couleur:`;
+        // Afficher les couleurs du client
+        const clientColorText = `Vos couleurs:`;
         ctx.fillStyle = 'white';
         ctx.fillText(clientColorText, 20, 60);
 
-        // Dessiner un cercle de la couleur du client
-        ctx.beginPath();
-        ctx.arc(187, 55, 15, 0, 2 * Math.PI);
-        ctx.fillStyle = clientColor;
-        ctx.fill();
-        ctx.lineWidth = 0;
-        ctx.stroke();
+        // Dessiner des cercles pour les 3 couleurs du client
+        clientAssignedColors.forEach((color, index) => {
+            ctx.beginPath();
+            ctx.arc(187 + index * 40, 55, 15, 0, 2 * Math.PI);
+            ctx.fillStyle = COLORS[color];
+            ctx.fill();
+            ctx.lineWidth = 0;
+            ctx.stroke();
+        });
     } else {
         console.log("Données insuffisantes pour afficher le tour du joueur");
     }
@@ -637,6 +642,7 @@ function drawPlayerTurnArrow() {
         ctx.stroke();
     }
 }
+
 
 
 
