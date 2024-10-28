@@ -263,7 +263,7 @@ canvas.addEventListener('click', (event) => {
         const [q, r] = pixelToHex(x, y);
 
         if (selectedPiece) {
-            if ((selectedPiece.q === q && selectedPiece.r === r) && !targetedPiece) {
+            if ((selectedPiece.q === q && selectedPiece.r === r)) {
                 selectedPiece = null;
                 possibleMoves = [];
                 availableCells = [];
