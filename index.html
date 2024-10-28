@@ -31,15 +31,16 @@
         }
         #pieceInfo {
             position: absolute;
-            right: -620px;
-            top: calc(50% - 100px);  /* Modifié pour remonter de 100px */
+            right: 20px;  /* Changé de -620px à 20px */
+            top: 50%;
             transform: translateY(-50%);
-            width: 200px;
-            background-color: #333;
+            width: 300px;
+            background-color: rgba(51, 51, 51, 0.9);
             color: white;
             padding: 20px;
             border-radius: 10px;
             display: none;
+            z-index: 1000;  /* Ajouté pour s'assurer qu'il est au-dessus du canvas */
         }
 
         #pieceInfo h3 {
@@ -52,6 +53,7 @@
             height: 100px;
             display: block;
             margin: 10px auto;
+            filter: invert(1);  /* Pour rendre les images SVG blanches */
         }
 
         #pieceInfo p {
