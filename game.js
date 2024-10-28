@@ -653,11 +653,6 @@ function drawPlayerTurnArrow() {
 
 
 
-
-
-
-
-
 // Ajouter ces constantes pour les descriptions des pièces
 const PIECE_DESCRIPTIONS = {
     'assassin': "L'Assassin peut traverser les pièces alliées et capturer une pièce ennemie. Sa victime sera placée là où se troauvait l'assassin.",
@@ -677,9 +672,13 @@ function updatePieceInfo(piece) {
     const pieceDescription = document.getElementById('pieceDescription');
 
     pieceInfo.style.display = 'block';
-    pieceImage.src = `public/assets/${piece.piece_class}.svg`;
+    // Corriger le chemin de l'image
+    pieceImage.src = `assets/${piece.piece_class}.svg`;
     pieceClass.textContent = `Type: ${piece.piece_class}`;
-    pieceColor.textContent = `Couleur: ${piece.color}`;
+    // Convertir la couleur en format lisible
+    const colorRGB = Array.isArray(piece.color) ? `rgb(${piece.color.join(', ')})` : piece.color;
+    const colorName = NAMES[colorRGB] || colorRGB;
+    pieceColor.textContent = `Couleur: ${colorName}`;
     pieceDescription.textContent = PIECE_DESCRIPTIONS[piece.piece_class];
 }
 
@@ -687,4 +686,5 @@ function hidePieceInfo() {
     const pieceInfo = document.getElementById('pieceInfo');
     pieceInfo.style.display = 'none';
 }
+
 
